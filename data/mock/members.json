@@ -1,0 +1,87 @@
+[
+  {
+    "id": "1",
+    "name": "Rohit Sharma",
+    "email": "rohit@example.com",
+    "health_score": 82,
+    "lifetime_value": 180,
+    "next_renewal_date": "2025-12-05",
+    "last_login_at": "2025-10-21",
+    "status": "healthy"
+  },
+  {
+    "id": "mem-001",
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "status": "active",
+    "lastActive": "2025-05-15T14:30:00Z",
+    "joinDate": "2024-01-10T09:15:00Z",
+    "healthScore": 85,
+    "segment": "high_value",
+    "tags": ["premium", "engaged"],
+    "metadata": {
+      "plan": "enterprise",
+      "teamSize": 5
+    }
+  },
+  {
+    "id": "mem-002",
+    "name": "Jane Smith",
+    "email": "jane.smith@example.com",
+    "status": "at_risk",
+    "lastActive": "2025-04-20T11:45:00Z",
+    "joinDate": "2023-11-05T14:20:00Z",
+    "healthScore": 42,
+    "segment": "mid_value",
+    "tags": ["trial"],
+    "metadata": {
+      "plan": "pro",
+      "teamSize": 2
+    }
+  },
+  {
+    "id": "mem-003",
+    "name": "Alex Johnson",
+    "email": "alex.j@example.com",
+    "status": "churned",
+    "lastActive": "2025-03-01T16:20:00Z",
+    "joinDate": "2024-02-15T10:30:00Z",
+    "healthScore": 15,
+    "segment": "low_value",
+    "tags": ["inactive", "churned"],
+    "metadata": {
+      "plan": "basic",
+      "churnReason": "found_alternative"
+    }
+  },
+  {
+    "id": "mem-004",
+    "name": "Sarah Williams",
+    "email": "sarah.w@example.com",
+    "status": "active",
+    "lastActive": "2025-05-18T08:15:00Z",
+    "joinDate": "2024-03-22T13:45:00Z",
+    "healthScore": 92,
+    "segment": "high_value",
+    "tags": ["enterprise", "power_user"],
+    "metadata": {
+      "plan": "enterprise",
+      "teamSize": 12
+    }
+  },
+  {
+    "id": "mem-005",
+    "name": "Michael Brown",
+    "email": "michael.b@example.com",
+    "status": "inactive",
+    "lastActive": "2025-04-05T17:30:00Z",
+    "joinDate": "2024-01-28T11:20:00Z",
+    "healthScore": 28,
+    "segment": "mid_value",
+    "tags": ["inactive_30_days"],
+    "metadata": {
+      "plan": "pro",
+      "teamSize": 3
+    }
+  }
+]

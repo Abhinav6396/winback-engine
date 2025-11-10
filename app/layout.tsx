@@ -1,35 +1,50 @@
-import { WhopApp } from "@whop/react/components";
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+
+"use client";
+
+import { useEffect, useState } from 'react';
+import { Inter } from "next/font/google";
 import "./globals.css";
+import { ProvidersClient } from "./providers-client";
 
-const geistSans = Geist({
-	variable: "--font-geist-sans",
-	subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-	variable: "--font-geist-mono",
-	subsets: ["latin"],
-});
-
-export const metadata: Metadata = {
-	title: "Whop App",
-	description: "My Whop App",
-};
+// Using Inter as a reliable fallback font
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export default function RootLayout({
-	children,
+  children,
 }: Readonly<{
-	children: React.ReactNode;
+  children: React.ReactNode;
 }>) {
-	return (
-		<html lang="en" suppressHydrationWarning>
-			<body
-				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-			>
-				<WhopApp>{children}</WhopApp>
-			</body>
-		</html>
-	);
+  const [mounted, setMounted] = useState(false);
+
+  // Prevent hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <html lang="en">
+        <body className="min-h-screen bg-background">
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+          </div>
+        </body>
+      </html>
+    );
+  }
+
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <style jsx global>{`
+          :root {
+            --font-inter: ${inter.style.fontFamily};
+          }
+        `}</style>
+      </head>
+      <body className="font-sans min-h-screen bg-background">
+        <ProvidersClient>{children}</ProvidersClient>
+      </body>
+    </html>
+  );
 }

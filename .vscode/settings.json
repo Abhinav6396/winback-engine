@@ -4,8 +4,18 @@
 	"editor.tabSize": 3,
 	"editor.detectIndentation": false,
 	"editor.insertSpaces": false,
+	"editor.quickSuggestions": {
+		"strings": true
+	},
+	"css.validate": false,
+	"tailwindCSS.emmetCompletions": true,
+	"tailwindCSS.includeLanguages": {
+		"plaintext": "html"
+	},
+	"tailwindCSS.experimental.configFile": "tailwind.config.js",
 	"editor.codeActionsOnSave": {
 		"source.fixAll.biome": "explicit",
 		"source.action.useSortedKeys.biome": "explicit"
-	}
+	},
+	"css.lint.unknownAtRules": "ignore"
 }
