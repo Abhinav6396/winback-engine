@@ -1,9 +1,8 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
-    // Basic webhook verification can be added here if needed
-    // For now, we'll just log the webhook payload
+    // Log the webhook payload for debugging
     const payload = await request.json();
     console.log('Webhook received:', payload);
     
