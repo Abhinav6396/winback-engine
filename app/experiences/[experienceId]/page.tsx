@@ -1,54 +1,70 @@
-import { Button } from "@whop/react/components";
-import { headers } from "next/headers";
-import Link from "next/link";
-import { whopsdk } from "@/lib/whop-sdk";
+import { notFound } from 'next/navigation';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 export default async function ExperiencePage({
-	params,
+  params,
 }: {
-	params: Promise<{ experienceId: string }>;
+  params: { experienceId: string };
 }) {
-	const { experienceId } = await params;
-	// Ensure the user is logged in on whop.
-	const { userId } = await whopsdk.verifyUserToken(await headers());
+  const { experienceId } = params;
+  
+  // Basic implementation without whop-sdk
+  // You can implement your own authentication and data fetching logic here
+  const isAuthenticated = true; // Replace with your auth check
+  
+  if (!isAuthenticated) {
+    // Redirect to login or show unauthorized
+    notFound();
+  }
+  
+  // Mock data - replace with your actual data fetching logic
+  const experience = { id: experienceId, title: 'Experience Title' };
+  const user = { id: 'user-id', name: 'User Name', username: 'username' }; 
+  const access = { hasAccess: true };
 
-	// Fetch the neccessary data we want from whop.
-	const [experience, user, access] = await Promise.all([
-		whopsdk.experiences.retrieve(experienceId),
-		whopsdk.users.retrieve(userId),
-		whopsdk.users.checkAccess(experienceId, { id: userId }),
-	]);
+  const displayName = user.name || `@${user.username}`;
 
-	const displayName = user.name || `@${user.username}`;
-
-	return (
-		<div className="flex flex-col p-8 gap-4">
-			<div className="flex justify-between items-center gap-4">
-				<h1 className="text-9">
-					Hi <strong>{displayName}</strong>!
-				</h1>
-				<Link href="https://docs.whop.com/apps" target="_blank">
-					<Button variant="classic" className="w-full" size="3">
-						Developer Docs
-					</Button>
-				</Link>
-			</div>
-
-			<p className="text-3 text-gray-10">
-				Welcome to you whop app! Replace this template with your own app. To
-				get you started, here's some helpful data you can fetch from whop.
-			</p>
-
-			<h3 className="text-6 font-bold">Experience data</h3>
-			<JsonViewer data={experience} />
-
-			<h3 className="text-6 font-bold">User data</h3>
-			<JsonViewer data={user} />
-
-			<h3 className="text-6 font-bold">Access data</h3>
-			<JsonViewer data={access} />
-		</div>
-	);
+  return (
+    <div className="flex flex-col p-8 gap-4">
+      <div className="flex justify-between items-center gap-4">
+        <h1 className="text-4xl font-bold">
+          Hi <strong>{displayName}</strong>!
+        </h1>
+        <Link href="https://docs.whop.com/apps" target="_blank">
+          <Button variant="outline">Documentation</Button>
+        </Link>
+      </div>
+      <Button asChild>
+        <Link href="/dashboard">Go to Dashboard</Link>
+      </Button>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h2 className="text-xl font-bold mb-2">Experience Details</h2>
+          <div className="bg-gray-50 p-4 rounded">
+            <pre className="text-sm overflow-auto">
+              <code>{JSON.stringify(experience, null, 2)}</code>
+            </pre>
+          </div>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h2 className="text-xl font-bold mb-2">User Details</h2>
+          <div className="bg-gray-50 p-4 rounded">
+            <pre className="text-sm overflow-auto">
+              <code>{JSON.stringify(user, null, 2)}</code>
+            </pre>
+          </div>
+        </div>
+      </div>
+      {!access.hasAccess && (
+        <div className="mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-400">
+          <p className="text-yellow-700">
+            You don&apos;t have access to this experience. Please upgrade your plan.
+          </p>
+        </div>
+      )}
+    </div>
+  );
 }
 
 function JsonViewer({ data }: { data: any }) {
