@@ -1,0 +1,88 @@
+[
+  {
+    "id": "camp_001",
+    "name": "Welcome Back Campaign",
+    "status": "active",
+    "type": "email",
+    "targetSegment": "inactive_30_days",
+    "startDate": "2023-11-01T00:00:00Z",
+    "endDate": "2023-12-31T23:59:59Z",
+    "createdAt": "2023-10-25T10:30:00Z",
+    "updatedAt": "2023-10-30T15:45:00Z",
+    "metrics": {
+      "sent": 1250,
+      "delivered": 1200,
+      "opened": 850,
+      "clicked": 420,
+      "converted": 210,
+      "bounceRate": 4.0,
+      "openRate": 70.8,
+      "clickThroughRate": 35.0,
+      "conversionRate": 17.5
+    }
+  },
+  {
+    "id": "camp_002",
+    "name": "Black Friday Special",
+    "status": "completed",
+    "type": "email",
+    "targetSegment": "all_active",
+    "startDate": "2023-11-20T00:00:00Z",
+    "endDate": "2023-11-27T23:59:59Z",
+    "createdAt": "2023-11-15T09:15:00Z",
+    "updatedAt": "2023-11-28T10:20:00Z",
+    "metrics": {
+      "sent": 3500,
+      "delivered": 3420,
+      "opened": 2800,
+      "clicked": 1500,
+      "converted": 750,
+      "bounceRate": 2.3,
+      "openRate": 81.9,
+      "clickThroughRate": 43.9,
+      "conversionRate": 21.9
+    }
+  },
+  {
+    "id": "camp_003",
+    "name": "App Engagement Push",
+    "status": "active",
+    "type": "push",
+    "targetSegment": "mobile_users",
+    "startDate": "2023-11-15T00:00:00Z",
+    "endDate": "2023-12-15T23:59:59Z",
+    "createdAt": "2023-11-10T14:20:00Z",
+    "updatedAt": "2023-11-10T14:20:00Z",
+    "metrics": {
+      "sent": 1800,
+      "delivered": 1750,
+      "opened": 1200,
+      "clicked": 900,
+      "converted": 450,
+      "bounceRate": 2.8,
+      "openRate": 68.6,
+      "clickThroughRate": 51.4,
+      "conversionRate": 25.7
+    }
+  },
+  {
+    "id": "camp_004",
+    "name": "Winback Special Offer",
+    "status": "draft",
+    "type": "email",
+    "targetSegment": "churned_60_days",
+    "createdAt": "2023-11-05T11:30:00Z",
+    "updatedAt": "2023-11-05T11:30:00Z"
+  },
+  {
+    "id": "camp_005",
+    "name": "Year End Review",
+    "status": "paused",
+    "type": "email",
+    "targetSegment": "active_6_months",
+    "startDate": "2023-12-20T00:00:00Z",
+    "endDate": "2023-12-31T23:59:59Z",
+    "createdAt": "2023-11-01T16:45:00Z",
+    "updatedAt": "2023-11-10T10:15:00Z"
+  }
+]

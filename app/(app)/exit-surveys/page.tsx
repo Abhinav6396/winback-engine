@@ -1,57 +1,51 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { Plus, MoreVertical, Search, Filter, Download, Calendar } from "lucide-react";
-import Link from "next/link";
+import { Search, Filter, Calendar, MessageSquare, Star, Download } from "lucide-react";
 import { mockApi } from "@/lib/mock-api";
 
-export default function CampaignsPage() {
-  const { data: campaignsResponse, isLoading } = useQuery({
-    queryKey: ['campaigns'],
-    queryFn: mockApi.campaigns.getCampaigns
+export default function ExitSurveysPage() {
+  const { data: surveysResponse, isLoading } = useQuery({
+    queryKey: ['exit-surveys'],
+    queryFn: mockApi.exitSurveys.getExitSurveys
   });
 
-  const campaigns = campaignsResponse?.data || [];
+  const surveys = surveysResponse?.data || [];
 
-  const getStatusBadgeClass = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'bg-green-100 text-green-800';
-      case 'draft':
-        return 'bg-gray-100 text-gray-800';
-      case 'completed':
-        return 'bg-blue-100 text-blue-800';
-      case 'paused':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'cancelled':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
+  const getReasonLabel = (reason: string) => {
+    const reasons: Record<string, string> = {
+      'too_expensive': 'Too Expensive',
+      'missing_features': 'Missing Features',
+      'found_better_alternative': 'Found Better Alternative',
+      'too_complicated': 'Too Complicated',
+      'customer_service': 'Customer Service',
+      'temporary': 'Temporary',
+      'other': 'Other'
+    };
+    return reasons[reason] || reason.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   };
 
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return '-';
+  const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
     });
   };
 
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case 'email':
-        return '✉️';
-      case 'push':
-        return '📱';
-      case 'sms':
-        return '💬';
-      case 'in_app':
-        return '📲';
-      default:
-        return '📢';
-    }
+  const renderRating = (rating: number) => {
+    return (
+      <div className="flex items-center">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <Star
+            key={star}
+            className={`h-4 w-4 ${star <= rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+          />
+        ))}
+      </div>
+    );
   };
 
   if (isLoading) {
@@ -76,15 +70,15 @@ export default function CampaignsPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Campaigns</h1>
-            <p className="text-sm text-gray-500">Manage and track your marketing campaigns</p>
+            <h1 className="text-2xl font-bold text-gray-900">Exit Surveys</h1>
+            <p className="text-sm text-gray-500">Feedback from members who have left or are considering leaving</p>
           </div>
           <div className="flex items-center gap-3">
             <div className="w-64">
               <div className="flex items-center bg-white p-2 rounded-xl border border-gray-200 shadow-sm focus-within:ring-2 focus-within:ring-yellow-400 focus-within:border-yellow-400 transition-all">
                 <input
                   type="text"
-                  placeholder="Search campaigns..."
+                  placeholder="Search surveys..."
                   className="w-full px-2 py-1 outline-none text-gray-700 placeholder-gray-400 bg-transparent text-sm"
                 />
                 <button type="button" className="p-1 text-gray-500 hover:text-gray-700 transition-colors">
@@ -95,36 +89,29 @@ export default function CampaignsPage() {
             <button className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50">
               <Filter className="h-5 w-5 text-gray-500" />
             </button>
-            <Link
-              href="/campaigns/new"
-              className="flex items-center gap-2 px-4 py-2 bg-yellow-400 text-gray-900 rounded-lg hover:bg-yellow-500 transition-colors"
-            >
-              <Plus className="h-4 w-4" />
-              <span>New Campaign</span>
-            </Link>
+            <button className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+              <Download className="h-5 w-5 text-gray-500" />
+            </button>
           </div>
         </div>
 
-        {/* Campaigns Table */}
+        {/* Surveys List */}
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Name
+                    Feedback
                   </th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
+                    Reason
                   </th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Type
+                    Rating
                   </th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Start Date
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    End Date
+                    Submitted
                   </th>
                   <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
@@ -132,38 +119,35 @@ export default function CampaignsPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {campaigns.map((campaign) => (
-                  <tr key={campaign.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="font-medium text-gray-900">{campaign.name}</div>
-                      <div className="text-sm text-gray-500">{campaign.targetSegment || 'No segment'}</div>
+                {surveys.map((survey) => (
+                  <tr key={survey.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4">
+                      <div className="flex items-start gap-3">
+                        <div className="flex-shrink-0 h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center">
+                          <MessageSquare className="h-5 w-5 text-yellow-600" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-900 line-clamp-2">{survey.feedback}</p>
+                        </div>
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(campaign.status)}`}>
-                        {campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1)}
+                      <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                        {getReasonLabel(survey.reason)}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg">{getTypeIcon(campaign.type)}</span>
-                        <span>{campaign.type.charAt(0).toUpperCase() + campaign.type.slice(1)}</span>
-                      </div>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {renderRating(survey.rating)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <div className="flex items-center gap-2">
                         <Calendar className="h-4 w-4 text-gray-400" />
-                        {formatDate(campaign.startDate)}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4 text-gray-400" />
-                        {formatDate(campaign.endDate)}
+                        {formatDate(survey.submittedAt)}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button className="text-gray-400 hover:text-gray-600">
-                        <MoreVertical className="h-5 w-5" />
+                      <button className="text-yellow-600 hover:text-yellow-800">
+                        View details
                       </button>
                     </td>
                   </tr>
@@ -185,8 +169,8 @@ export default function CampaignsPage() {
             <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm text-gray-700">
-                  Showing <span className="font-medium">1</span> to <span className="font-medium">{campaigns.length}</span> of{' '}
-                  <span className="font-medium">{campaigns.length}</span> results
+                  Showing <span className="font-medium">1</span> to <span className="font-medium">{surveys.length}</span> of{' '}
+                  <span className="font-medium">{surveys.length}</span> results
                 </p>
               </div>
               <div>

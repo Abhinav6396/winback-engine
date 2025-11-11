@@ -3,16 +3,23 @@
 import { useQuery } from "@tanstack/react-query";
 import { getMember } from "@/lib/mock-api";
 import { HealthScoreCard } from "@/components/cards/HealthScoreCard";
+import { ArrowUpIcon, ArrowDownIcon } from "@radix-ui/react-icons";
 import { useParams, useRouter } from "next/navigation";
 
 export default function MemberDetailPage() {
   const { id } = useParams();
   const router = useRouter();
 
-  const { data: member, isLoading } = useQuery({
+  const { data: memberData, isLoading } = useQuery({
     queryKey: ['member', id],
     queryFn: () => getMember(id as string)
   });
+
+  // Normalize member data to handle both health_score and healthScore
+  const member = memberData ? {
+    ...memberData,
+    health_score: memberData.health_score ?? memberData.healthScore ?? 0
+  } : null;
 
   if (isLoading) return <div className="p-6">Loading...</div>;
   if (!member) return <div className="p-6">Member not found</div>;
@@ -31,14 +38,15 @@ export default function MemberDetailPage() {
         </button>
         
         <div className="flex justify-between items-start">
-          <div>
+          <div className="mt-4">
             <h1 className="text-2xl font-bold">{member.name}</h1>
-            <p className="text-gray-600">{member.email}</p>
+            <p className="text-gray-600 mt-1">{member.email}</p>
           </div>
-          <div className="flex space-x-2">
+          <div className="flex">
             <button className="px-4 py-2 border rounded-md hover:bg-gray-50">
               Edit
             </button>
+            <div className="w-6"></div>
             <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
               Send Message
             </button>
@@ -103,7 +111,65 @@ export default function MemberDetailPage() {
             tier={member.status}
             reasons={[]}
           />
-          
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold mb-4">Health Score Breakdown</h2>
+            <div className="space-y-4">
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-sm font-medium">Overall Health Score</span>
+                  <div className="flex items-center">
+                    <span className="text-2xl font-bold mr-2">{member.health_score || 0}%</span>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      (member.health_score || 0) >= 70 ? 'bg-green-100 text-green-800' :
+                      (member.health_score || 0) >= 40 ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-red-100 text-red-800'
+                    }`}>
+                      {member.status || 'N/A'}
+                    </span>
+                  </div>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div 
+                    className={`h-2.5 rounded-full ${
+                      (member.health_score || 0) >= 70 ? 'bg-green-500' :
+                      (member.health_score || 0) >= 40 ? 'bg-yellow-500' :
+                      'bg-red-500'
+                    }`}
+                    style={{ width: `${member.health_score || 0}%` }}
+                  ></div>
+                </div>
+              </div>
+              
+              <div className="mt-6 space-y-3">
+                <h3 className="font-medium">Key Factors</h3>
+                <div className="space-y-2">
+                  {[
+                    { label: 'Active Usage', value: 75, change: 5 },
+                    { label: 'Engagement', value: 60, change: -2 },
+                    { label: 'Support Tickets', value: 45, change: -8 },
+                    { label: 'Feature Usage', value: 85, change: 3 }
+                  ].map((item, index) => (
+                    <div key={index} className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">{item.label}</span>
+                      <div className="flex items-center">
+                        <span className="text-sm font-medium w-10 text-right mr-2">{item.value}%</span>
+                        <div className={`flex items-center text-xs ${
+                          item.change >= 0 ? 'text-green-600' : 'text-red-600'
+                        }`}>
+                          {item.change >= 0 ? (
+                            <ArrowUpIcon className="w-3 h-3 mr-1" />
+                          ) : (
+                            <ArrowDownIcon className="w-3 h-3 mr-1" />
+                          )}
+                          {Math.abs(item.change)}%
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
             <div className="space-y-2">

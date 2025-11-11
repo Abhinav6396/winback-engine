@@ -1,223 +1,249 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, ArrowUp, ArrowDown, Users, Activity, TrendingUp, Clock, PlusCircle, Mail, BarChart } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { getDashboard } from "@/lib/api";
-import { useQuery } from '@tanstack/react-query';
-
-interface DashboardData {
-  metrics: {
-    churnRate: number;
-    atRiskCount: number;
-    avgHealthScore: number;
-    revenueSaved: number;
-  };
-  churnTrend: Array<{
-    month: string;
-    churnPct: number;
-  }>;
-  distribution: {
-    healthy: number;
-    at_risk: number;
-    critical: number;
-  };
-}
+import { useQuery } from "@tanstack/react-query";
+import { Search, ChevronDown, LogOut, HelpCircle, User } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { getDashboard, membersApi } from "@/lib/api";
+import { Member } from "@/lib/types";
+import {
+  BarChart, Bar, XAxis, YAxis, ResponsiveContainer,
+  LineChart, Line, Tooltip
+} from "recharts";
+import Link from "next/link";
 
 export default function DashboardPage() {
-  const { data: dashboardData, isLoading, error } = useQuery<DashboardData>({
+  // All hooks must be called at the top level, before any conditional returns
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  
+  // Move useEffect before any conditional returns
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Data fetching hooks
+  const { data: dashboard, isLoading: loadingDashboard } = useQuery({
     queryKey: ['dashboard'],
-    queryFn: getDashboard,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    queryFn: getDashboard
+  });
+  
+  const { data: membersResponse, isLoading: loadingMembers } = useQuery({
+    queryKey: ['members'],
+    queryFn: membersApi.getMembers
   });
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
+  // Loading and error states
+  if (loadingDashboard || loadingMembers) return <div className="p-8">Loading...</div>;
+  if (!dashboard) return <div className="p-8">Unable to load dashboard data</div>;
 
-  if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-red-500">Error loading dashboard data. Please try again later.</div>
-      </div>
-    );
-  }
+  // Data processing after we know we have data
+  const { metrics, distribution, churnTrend } = dashboard;
+  const members = membersResponse?.data || [];
+  const atRiskMembers = members.filter((m: Member) => m.status && m.status.toLowerCase() !== "healthy").slice(0, 5);
 
-  if (!dashboardData) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-red-500">No dashboard data available.</div>
-      </div>
-    );
-  }
-
-  const metrics = [
-    {
-      title: "Total Campaigns",
-      value: "0",
-      description: "Active campaigns",
-      icon: "📊",
-      change: "",
-      isPositive: true,
-    },
-    {
-      title: "Engagement",
-      value: "0%",
-      description: "Average engagement rate",
-      icon: "💬",
-      change: "",
-      isPositive: true,
-    },
-    {
-      title: "Leads",
-      value: "0",
-      description: "New leads this month",
-      icon: "📈",
-      change: "",
-      isPositive: true,
-    },
-    {
-      title: "Tasks",
-      value: "0",
-      description: "Pending tasks",
-      icon: "✅",
-      change: "",
-      isPositive: true,
-    },
-  ];
-
-  const recentActivity = [
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john@example.com",
-      action: "updated profile",
-      time: "2 minutes ago",
-      avatar: "JD",
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      email: "jane@example.com",
-      action: "completed onboarding",
-      time: "1 hour ago",
-      avatar: "JS",
-    },
-    {
-      id: 3,
-      name: "Alex Johnson",
-      email: "alex@example.com",
-      action: "upgraded to Pro",
-      time: "3 hours ago",
-      avatar: "AJ",
-    },
-  ];
+  const userInitials = 'AK'; // Replace with actual user initials
 
   return (
-    <div className="flex-1 space-y-6 p-6">
-      <div className="flex flex-col justify-between space-y-2 md:flex-row md:items-center">
+    <div className="space-y-6">
+      {/* Header with Search and User Menu */}
+      <div className="flex items-center justify-between gap-4">
+        {/* Welcome Message */}
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Hi User!</h1>
-          <p className="text-muted-foreground">Welcome to your dashboard. This is where you'll find all your important metrics and quick actions.</p>
+          <h1 className="text-2xl font-semibold">Welcome back 👋</h1>
+          <p className="text-gray-500 text-sm">Here's how your members are doing this month.</p>
         </div>
-        <div className="flex items-center space-x-2">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search members..."
-              className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px]"
-            />
+
+        {/* Search and User Menu Container */}
+        <div className="flex items-center gap-4">
+          {/* Search Bar */}
+          <div className="w-64">
+            <div className="flex items-center bg-white p-2 rounded-xl border border-gray-200 shadow-sm focus-within:ring-2 focus-within:ring-yellow-400 focus-within:border-yellow-400 transition-all">
+              <input
+                type="text"
+                placeholder="Search..."
+                className="w-full px-3 py-1.5 outline-none text-gray-700 placeholder-gray-400 bg-transparent text-sm"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <button className="p-1 text-gray-500 hover:text-gray-700 transition-colors">
+                <Search className="w-4 h-4" />
+              </button>
+            </div>
           </div>
-          <Button>New Member</Button>
+
+          {/* User Menu */}
+          <div className="relative" ref={dropdownRef}>
+            <button 
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+              aria-haspopup="true"
+              aria-expanded={isDropdownOpen}
+            >
+              <div className="w-9 h-9 rounded-full bg-yellow-400 flex items-center justify-center text-gray-800 font-medium text-sm">
+                {userInitials}
+              </div>
+              <ChevronDown className={`w-4 h-4 text-gray-600 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {/* Dropdown Menu */}
+            {isDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 z-10 overflow-hidden">
+                <div className="p-2">
+                  <div className="px-4 py-3 border-b border-gray-100">
+                    <p className="text-sm font-medium text-gray-900">Abhinav Kumar</p>
+                    <p className="text-xs text-gray-500 truncate">abhinav@example.com</p>
+                  </div>
+                  <div className="py-1">
+                    <a
+                      href="#"
+                      className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 rounded-lg mx-1"
+                    >
+                      <User className="w-4 h-4 mr-3 text-gray-500" />
+                      Your Profile
+                    </a>
+                    <a
+                      href="#"
+                      className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 rounded-lg mx-1"
+                    >
+                      <HelpCircle className="w-4 h-4 mr-3 text-gray-500" />
+                      Help & Support
+                    </a>
+                  </div>
+                  <div className="py-1 border-t border-gray-100">
+                    <button
+                      onClick={() => {
+                        // Handle logout logic here
+                        console.log('Logout clicked');
+                        setIsDropdownOpen(false);
+                      }}
+                      className="w-full flex items-center px-4 py-2.5 text-sm text-left text-red-600 hover:bg-red-50 rounded-lg mx-1"
+                    >
+                      <LogOut className="w-4 h-4 mr-3" />
+                      Sign out
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          <TabsTrigger value="reports">Reports</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
-        </TabsList>
+      {/* TOP METRICS */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <MetricCard label="Churn Rate" value={`${(metrics.churnRate * 100).toFixed(1)}%`} />
+        <MetricCard label="At-Risk Members" value={metrics.atRiskCount} />
+        <MetricCard label="Avg Health Score" value={metrics.avgHealthScore} />
+        <MetricCard label="Revenue Saved" value={`$${metrics.revenueSaved.toLocaleString()}`} />
+      </div>
 
-        <TabsContent value="overview" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {metrics.map((metric, index) => (
-              <Card key={index}>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">{metric.title}</CardTitle>
-                  <span className="text-2xl">{metric.icon}</span>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{metric.value}</div>
-                  <p className="text-xs text-muted-foreground">{metric.description}</p>
-                </CardContent>
-              </Card>
+      {/* CHARTS */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        {/* Health Breakdown */}
+        <Card title="Member Health Breakdown">
+          <ResponsiveContainer width="100%" height={240}>
+            <BarChart data={[
+              { name: "Healthy", value: distribution.healthy },
+              { name: "At Risk", value: distribution.at_risk },
+              { name: "Critical", value: distribution.critical },
+            ]}>
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Bar dataKey="value" />
+            </BarChart>
+          </ResponsiveContainer>
+        </Card>
+
+        {/* Churn Trend */}
+        <Card title="Churn Trend">
+          <ResponsiveContainer width="100%" height={240}>
+            <LineChart data={churnTrend}>
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Line type="monotone" dataKey="churnPct" stroke="#2563eb" strokeWidth={2} />
+            </LineChart>
+          </ResponsiveContainer>
+        </Card>
+
+      </div>
+
+      {/* At Risk Table */}
+      <Card title="At-Risk Members Who Need Attention">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-gray-500 border-b">
+              <th className="text-left py-2">Name</th>
+              <th>Health</th>
+              <th>LTV</th>
+              <th>Last Login</th>
+              <th>Next Renewal</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {atRiskMembers.map((member: Member) => (
+              <tr key={member.id} className="border-b">
+                <td className="py-2">{member.name}</td>
+                <td className="text-center">{member.health_score}</td>
+                <td className="text-center">${member.lifetime_value}</td>
+                <td className="text-center">{member.last_login_at || "-"}</td>
+                <td className="text-center">{member.next_renewal_date || "-"}</td>
+                <td>
+                  <Link href={`/members/${member.id}`} className="text-blue-600 hover:underline">
+                    Message
+                  </Link>
+                </td>
+              </tr>
             ))}
-          </div>
+          </tbody>
+        </table>
 
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-            <Card className="col-span-4">
-              <CardHeader>
-                <CardTitle>Recent Activity</CardTitle>
-                <CardDescription>Latest actions from your team</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {recentActivity.map((activity) => (
-                    <div key={activity.id} className="flex items-center gap-4">
-                      <Avatar className="h-9 w-9">
-                        <AvatarFallback>{activity.avatar}</AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <h3 className="text-sm font-medium">{activity.name}</h3>
-                          <span className="text-xs text-muted-foreground">{activity.time}</span>
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          {activity.action}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="col-span-3">
-              <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
-                <CardDescription>Common tasks and shortcuts</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-2">
-                  <Button variant="outline" className="w-full justify-start">
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    Add New Member
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    <Mail className="mr-2 h-4 w-4" />
-                    Send Email Campaign
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    <BarChart className="mr-2 h-4 w-4" />
-                    View Reports
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-      </Tabs>
+        <div className="flex justify-between mt-4">
+          <Link href="/members" className="text-blue-600 hover:underline">View all members</Link>
+          <Link href="/campaigns" className="text-blue-600 hover:underline">Run win-back campaign →</Link>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+// Reusable UI helpers
+
+interface CardProps {
+  title: string;
+  children: React.ReactNode;
+}
+
+function Card({ title, children }: CardProps) {
+  return (
+    <div className="p-5 bg-white border rounded-xl shadow-sm">
+      <h2 className="text-lg font-semibold mb-4">{title}</h2>
+      {children}
+    </div>
+  );
+}
+
+interface MetricCardProps {
+  label: string;
+  value: string | number;
+}
+
+function MetricCard({ label, value }: MetricCardProps) {
+  return (
+    <div className="p-5 bg-white border rounded-xl shadow-sm">
+      <div className="text-sm text-gray-500">{label}</div>
+      <div className="text-2xl font-semibold mt-2">{value}</div>
     </div>
   );
 }

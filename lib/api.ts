@@ -1,82 +1,59 @@
-import axios from 'axios';
+// Mock API implementation
+import { mockApi } from './mock-api';
+import { getDashboard } from './mock-dashboard';
 
-const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || '/api',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-// Add a request interceptor to include auth token if available
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Add a response interceptor to handle common errors
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Handle unauthorized access
-      window.location.href = '/login';
-    }
-    return Promise.reject(error);
-  }
-);
-
+// Mock API client that uses the mock data
 export const membersApi = {
-  getMembers: () => api.get('/members'),
-  getMember: (id: string) => api.get(`/members/${id}`),
-  updateMember: (id: string, data: any) => api.put(`/members/${id}`, data),
-  deleteMember: (id: string) => api.delete(`/members/${id}`),
+  getMembers: mockApi.members.getMembers,
+  getMember: mockApi.members.getMember,
+  updateMember: async (id: string, data: any) => {
+    // In a real implementation, this would update the data
+    console.log('Mock updateMember:', { id, data });
+    return { data };
+  },
+  deleteMember: async (id: string) => {
+    // In a real implementation, this would delete the data
+    console.log('Mock deleteMember:', id);
+    return { data: { success: true } };
+  },
 };
 
 export const campaignsApi = {
-  getCampaigns: () => api.get('/campaigns'),
-  createCampaign: (data: any) => api.post('/campaigns', data),
-  updateCampaign: (id: string, data: any) => api.put(`/campaigns/${id}`, data),
-  deleteCampaign: (id: string) => api.delete(`/campaigns/${id}`),
+  getCampaigns: async () => {
+    console.log('Mock getCampaigns');
+    return { data: [] };
+  },
+  createCampaign: async (data: any) => {
+    console.log('Mock createCampaign:', data);
+    return { data };
+  },
+  updateCampaign: async (id: string, data: any) => {
+    console.log('Mock updateCampaign:', { id, data });
+    return { data };
+  },
+  deleteCampaign: async (id: string) => {
+    console.log('Mock deleteCampaign:', id);
+    return { data: { success: true } };
+  },
 };
 
 export const exitSurveysApi = {
-  getSurveys: () => api.get('/exit-surveys'),
-  submitSurvey: (data: any) => api.post('/exit-surveys', data),
-  getSurvey: (id: string) => api.get(`/exit-surveys/${id}`),
+  getSurveys: async () => {
+    console.log('Mock getSurveys');
+    return { data: [] };
+  },
+  submitSurvey: async (data: any) => {
+    console.log('Mock submitSurvey:', data);
+    return { data };
+  },
+  getSurvey: async (id: string) => {
+    console.log('Mock getSurvey:', id);
+    return { data: null };
+  },
 };
 
-export async function getDashboard() {
-  await new Promise(r => setTimeout(r, 200));
-
-  return {
-    metrics: {
-      churnRate: 0.08,
-      atRiskCount: 27,
-      avgHealthScore: 67,
-      revenueSaved: 1240,
-    },
-    churnTrend: [
-      { month: "Jun", churnPct: 0.12 },
-      { month: "Jul", churnPct: 0.11 },
-      { month: "Aug", churnPct: 0.10 },
-      { month: "Sep", churnPct: 0.09 },
-      { month: "Oct", churnPct: 0.082 },
-    ],
-    distribution: {
-      healthy: 120,
-      at_risk: 45,
-      critical: 19,
-    }
-  };
-}
+// Export the dashboard function directly
+export { getDashboard };
 
 
-export default api;
+// No default export needed for mock implementation

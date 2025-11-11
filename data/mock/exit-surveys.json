@@ -1,0 +1,79 @@
+[
+  {
+    "id": "es_001",
+    "memberId": "mem_001",
+    "reason": "too_expensive",
+    "feedback": "I really liked the service, but it's a bit too expensive for me right now. Would love to come back if there are any discounts in the future.",
+    "rating": 4,
+    "submittedAt": "2023-11-05T14:30:22Z",
+    "metadata": {
+      "plan": "premium",
+      "usageMonths": 8,
+      "suggestedPrice": 19.99
+    }
+  },
+  {
+    "id": "es_002",
+    "memberId": "mem_003",
+    "reason": "missing_features",
+    "feedback": "The product is good but lacks some key features that I need for my workflow, especially in the analytics dashboard.",
+    "rating": 3,
+    "submittedAt": "2023-11-07T09:15:10Z",
+    "metadata": {
+      "plan": "business",
+      "usageMonths": 3,
+      "requestedFeatures": ["custom reports", "API access"]
+    }
+  },
+  {
+    "id": "es_003",
+    "memberId": "mem_007",
+    "reason": "found_better_alternative",
+    "feedback": "I found another service that better suits my needs at the moment.",
+    "rating": 2,
+    "submittedAt": "2023-11-08T16:45:33Z"
+  },
+  {
+    "id": "es_004",
+    "memberId": "mem_012",
+    "reason": "too_expensive",
+    "feedback": "The price increase was too steep for me to continue. The service is great, but not at this price point.",
+    "rating": 3,
+    "submittedAt": "2023-11-10T11:20:15Z",
+    "metadata": {
+      "plan": "pro",
+      "usageMonths": 12,
+      "previousPrice": 29.99,
+      "newPrice": 49.99
+    }
+  },
+  {
+    "id": "es_005",
+    "memberId": "mem_015",
+    "reason": "too_complicated",
+    "feedback": "The platform has too many features that I don't use, which makes it feel cluttered and hard to navigate.",
+    "rating": 2,
+    "submittedAt": "2023-11-12T14:10:45Z"
+  },
+  {
+    "id": "es_006",
+    "memberId": "mem_018",
+    "reason": "customer_service",
+    "feedback": "I had several issues that weren't resolved by customer support in a timely manner, which affected my business.",
+    "rating": 1,
+    "submittedAt": "2023-11-15T10:05:18Z"
+  },
+  {
+    "id": "es_007",
+    "memberId": "mem_022",
+    "reason": "temporary",
+    "feedback": "I'm taking a break for now but plan to return in a few months. I'll be back!",
+    "rating": 5,
+    "submittedAt": "2023-11-18T13:25:30Z",
+    "metadata": {
+      "plan": "premium",
+      "usageMonths": 6,
+      "expectedReturn": "Q1 2024"
+    }
+  }
+]

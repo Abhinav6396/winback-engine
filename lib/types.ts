@@ -83,7 +83,7 @@ export interface FormField {
 }
 
 // Health and Dashboard related types
-export type HealthTier = "healthy" | "at_risk" | "critical";
+export type HealthTier = "healthy" | "at_risk" | "critical" | "churned";
 
 export interface DashboardMetrics {
   churnRate: number;
@@ -119,7 +119,8 @@ export interface Member {
   id: string;
   name: string;
   email: string;
-  health_score: number;
+  health_score?: number;
+  healthScore?: number;
   lifetime_value: number;
   next_renewal_date?: string | null;
   last_login_at?: string | null;
