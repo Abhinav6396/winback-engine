@@ -3,8 +3,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { getMember } from "@/lib/mock-api";
 import { HealthScoreCard } from "@/components/cards/HealthScoreCard";
-import { ArrowUpIcon, ArrowDownIcon } from "@radix-ui/react-icons";
-import { useParams, useRouter } from "next/navigation";
+import { formatDistanceToNow } from "date-fns";
+import { useRouter, useParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import type { Member } from "@/lib/types";
+import { ArrowUp as ArrowUpIcon, ArrowDown as ArrowDownIcon } from "lucide-react";
 
 export default function MemberDetailPage() {
   const { id } = useParams();
@@ -15,10 +18,13 @@ export default function MemberDetailPage() {
     queryFn: () => getMember(id as string)
   });
 
-  // Normalize member data to handle both health_score and healthScore
-  const member = memberData ? {
-    ...memberData,
-    health_score: memberData.health_score ?? memberData.healthScore ?? 0
+  // Type assertion to handle the API response
+  const member = memberData?.data ? {
+    ...memberData.data,
+    // Ensure we have a health score, defaulting to 0 if not present
+    health_score: (memberData.data as any).health_score ?? (memberData.data as any).healthScore ?? 0,
+    // Ensure we have a status, defaulting to 'healthy' if not present
+    status: memberData.data.status || 'healthy'
   } : null;
 
   if (isLoading) return <div className="p-6">Loading...</div>;
