@@ -1,0 +1,14 @@
+[00:00:01.813] Server  LOG      ✓ Ready in 1126ms
+[00:00:06.940] Server  LOG      ○ Compiling /dashboard ...
+[00:00:11.938] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:20.837] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:02:53.718] Server  LOG        Reload env: .env.development.local
+[00:03:30.210] Server  LOG        Reload env: .env.development.local
+[00:56:40.997] Server  LOG        Reload env: .env.development.local
+[00:56:53.071] Server  LOG        Reload env: .env.development.local
+[00:57:03.739] Server  LOG        Reload env: .env.development.local
+[00:57:08.659] Server  LOG        Reload env: .env.development.local
+[00:57:19.013] Server  LOG        Reload env: .env.development.local
+[00:57:22.926] Server  LOG        Reload env: .env.development.local
+[00:57:39.458] Server  LOG        Reload env: .env.development.local
+[00:57:55.284] Server  LOG        Reload env: .env.development.local
